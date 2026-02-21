@@ -1,0 +1,18 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v"
+
+[tool.black]
+line-length = 120
+target-version = ["py39"]
+
+[tool.flake8]
+max-line-length = 120
+exclude = [".git", "__pycache__", "build", "dist", "*.egg-info"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
