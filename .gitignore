@@ -27,6 +27,11 @@ venv/
 htmlcov/
 coverage.xml
 
+# PyInstaller
+*.spec.bak
+build/
+dist/
+
 # OS
 .DS_Store
 Thumbs.db

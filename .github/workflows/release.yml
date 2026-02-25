@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  # ── Stage 1: Build Windows EXE ──────────────────────────────────────────────
+  build-exe:
+    name: Build Windows EXE
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build executable
+        run: python build_exe.py
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: simpleprj-exe-windows
+          path: dist/simpleprj.exe
+
+  # ── Stage 2: Publish GitHub Release ─────────────────────────────────────────
+  publish-release:
+    name: Publish GitHub Release
+    needs: build-exe
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download EXE artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: simpleprj-exe-windows
+          path: release-assets
+
+      - name: Extract Release Notes from CHANGELOG.md
+        run: |
+          VERSION="${{ github.ref_name }}"
+          echo "Extracting release notes for $VERSION"
+          awk -v ver="$VERSION" '
+            BEGIN { capture=0 }
+            $0 ~ "^[[:space:]]*[*+-][[:space:]]+\\*\\*" ver { capture=1; next }
+            capture && $0 ~ "^[[:space:]]*[*+-][[:space:]]+\\*\\*v" { capture=0; exit }
+            capture { print }
+          ' CHANGELOG.md | sed 's/^[[:space:]]\{2\}//' > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "See the assets below to download and install this version." > release_notes.md
+          fi
+          echo "--- Release Notes ---"
+          cat release_notes.md
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          allowUpdates: true
+          name: "SimplePrj ${{ github.ref_name }}"
+          bodyFile: "release_notes.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "release-assets/simpleprj.exe"
+          artifactErrorsFailBuild: false
+          replacesArtifacts: true
+          makeLatest: legacy
