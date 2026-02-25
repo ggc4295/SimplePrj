@@ -1,0 +1,6 @@
+# Tell GitHub Linguist to exclude web_site/ from language statistics.
+# These are static documentation/website files, not the project's source code.
+web_site/* linguist-documentation
+
+# Also exclude generated files
+*.egg-info/* linguist-generated
