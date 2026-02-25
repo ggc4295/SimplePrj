@@ -11,7 +11,7 @@ def main():
     print("=" * 40)
 
     calc = Calculator()
-    print(f"\nCalculator Demo:")
+    print("\nCalculator Demo:")
     print(f"  3 + 5      = {calc.add(3, 5)}")
     print(f"  10 - 4     = {calc.subtract(10, 4)}")
     print(f"  6 * 7      = {calc.multiply(6, 7)}")
