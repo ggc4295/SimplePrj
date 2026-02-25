@@ -82,11 +82,18 @@ jobs:
             echo 'EOF'
           } >> $GITHUB_OUTPUT
 
+      - name: Find existing review comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "🤖 Automated Code Review"
+
       - name: Post or update PR comment
         uses: peter-evans/create-or-update-comment@v4
         with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.build-comment.outputs.COMMENT }}
           edit-mode: replace
-          comment-author: "github-actions[bot]"
-          body-includes: "🤖 Automated Code Review"
