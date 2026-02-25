@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimplePrj - 简洁 Python 工具集</title>
+    <meta
+      name="description"
+      content="SimplePrj 是一个用于演示 GitHub CI/CD 的 Python 工具集，包含计算器和常用工具函数，可打包为独立 Windows EXE。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0a0e1a;
+        --bg2: #111827;
+        --bg3: #1a2235;
+        --accent: #6366f1;
+        --accent2: #818cf8;
+        --green: #10b981;
+        --text: #f1f5f9;
+        --muted: #64748b;
+        --border: #1e293b;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        background: rgba(10, 14, 26, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-brand {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent2);
+        text-decoration: none;
+        letter-spacing: 0.02em;
+      }
+      .nav-links {
+        display: flex;
+        gap: 1.5rem;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+      }
+      .nav-badge {
+        background: var(--accent);
+        color: #fff;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+      .nav-badge:hover {
+        background: var(--accent2);
+      }
+
+      /* ── Hero ── */
+      .hero {
+        text-align: center;
+        padding: 7rem 2rem 5rem;
+        background: radial-gradient(
+          ellipse 80% 50% at 50% 0%,
+          rgba(99, 102, 241, 0.18) 0%,
+          transparent 70%
+        );
+      }
+      .hero-tag {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        padding: 0.3rem 1rem;
+        border-radius: 999px;
+        background: rgba(99, 102, 241, 0.15);
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        font-size: 0.8rem;
+        color: var(--accent2);
+        letter-spacing: 0.05em;
+      }
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+      }
+      h1 span {
+        background: linear-gradient(135deg, #818cf8, #6ee7b7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero p {
+        max-width: 560px;
+        margin: 0 auto 2.5rem;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.6rem;
+        border-radius: 8px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+      .btn-primary:hover {
+        background: var(--accent2);
+        transform: translateY(-1px);
+      }
+      .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.6rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-weight: 500;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition:
+          border-color 0.2s,
+          transform 0.15s;
+      }
+      .btn-outline:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      /* ── Badge row ── */
+      .badges {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        padding: 1.5rem 2rem;
+      }
+      .badge {
+        height: 20px;
+      }
+
+      /* ── Section ── */
+      section {
+        padding: 5rem 2rem;
+      }
+      .section-label {
+        text-align: center;
+        color: var(--accent2);
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+      }
+      h2 {
+        text-align: center;
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+      .section-sub {
+        text-align: center;
+        color: var(--muted);
+        max-width: 520px;
+        margin: 0 auto 3rem;
+      }
+
+      /* ── Feature cards ── */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.6rem;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+      .card:hover {
+        border-color: var(--accent);
+        transform: translateY(-3px);
+      }
+      .card-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.9rem;
+      }
+      .card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .card p {
+        font-size: 0.875rem;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      /* ── Code block ── */
+      .code-section {
+        background: var(--bg2);
+      }
+      .code-wrap {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      .code-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .tab-btn {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.82rem;
+        color: var(--muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .tab-btn.active {
+        color: var(--accent2);
+        border-bottom-color: var(--accent2);
+      }
+      pre {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 0 8px 8px 8px;
+        padding: 1.4rem 1.6rem;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        line-height: 1.7;
+      }
+      code {
+        font-family: "Fira Code", "Cascadia Code", monospace;
+        color: #a5f3fc;
+      }
+      .cm {
+        color: var(--muted);
+      }
+      .ck {
+        color: #c084fc;
+      }
+      .cs {
+        color: #86efac;
+      }
+
+      /* ── CI pipeline ── */
+      .pipeline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0 auto;
+        max-width: 800px;
+      }
+      .pipe-step {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.65rem 1.1rem;
+        font-size: 0.85rem;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .pipe-step .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        display: inline-block;
+      }
+      .pipe-arrow {
+        color: var(--muted);
+        font-size: 1.1rem;
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 2rem;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--text);
+      }
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Nav -->
+    <nav>
+      <a class="nav-brand" href="index.html">SimplePrj</a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="qa.html">常见问题</a></li>
+        <li>
+          <a href="https://github.com/ggc4295/SimplePrj" target="_blank"
+            >GitHub</a
+          >
+        </li>
+      </ul>
+      <a
+        class="nav-badge"
+        href="https://github.com/ggc4295/SimplePrj/releases"
+        target="_blank"
+        >⬇ 立即下载</a
+      >
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-tag">Python · CI/CD · PyInstaller</div>
+      <h1>简洁而现代的<br /><span>Python 工具集</span></h1>
+      <p>
+        内置计算器与常用数学工具函数，完整的 GitHub CI/CD 流水线，一键打包为独立
+        Windows EXE。
+      </p>
+      <div class="hero-actions">
+        <a
+          class="btn-primary"
+          href="https://github.com/ggc4295/SimplePrj/releases"
+          target="_blank"
+          >⬇ 下载 EXE</a
+        >
+        <a
+          class="btn-outline"
+          href="https://github.com/ggc4295/SimplePrj"
+          target="_blank"
+          >★ 查看源码</a
+        >
+      </div>
+    </section>
+
+    <!-- Badges -->
+    <div class="badges">
+      <img
+        class="badge"
+        src="https://github.com/ggc4295/SimplePrj/actions/workflows/ci.yml/badge.svg"
+        alt="CI"
+      />
+      <img
+        class="badge"
+        src="https://github.com/ggc4295/SimplePrj/actions/workflows/secret-scan.yml/badge.svg"
+        alt="Secret Scan"
+      />
+      <img
+        class="badge"
+        src="https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue?logo=python&logoColor=white"
+        alt="Python"
+      />
+      <img
+        class="badge"
+        src="https://img.shields.io/badge/license-MIT-green"
+        alt="License"
+      />
+    </div>
+
+    <!-- Features -->
+    <section>
+      <p class="section-label">功能特性</p>
+      <h2>开箱即用的工具模块</h2>
+      <p class="section-sub">
+        精心设计的 Python 模块，完整的类型注解与单元测试覆盖。
+      </p>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🧮</div>
+          <h3>Calculator</h3>
+          <p>加、减、乘、除、幂运算、取模，带完整参数校验与类型注解。</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔢</div>
+          <h3>Math Utils</h3>
+          <p>
+            is_even、is_positive、factorial、fibonacci、clamp —
+            高频数学工具一网打尽。
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📦</div>
+          <h3>独立 EXE</h3>
+          <p>
+            PyInstaller 一键打包，生成无需 Python 环境即可运行的 Windows
+            可执行文件。
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>安全扫描</h3>
+          <p>
+            每次 push 自动运行 Gitleaks，防止 API Key 或密码意外提交到代码库。
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🤖</div>
+          <h3>代码审查</h3>
+          <p>
+            PR 自动触发 flake8 + black 检查，结果以评论形式直接展示在 PR 页面。
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <h3>自动发布</h3>
+          <p>
+            打 v* tag 即触发构建，自动创建 GitHub Release 并附上 Windows EXE。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code example -->
+    <section class="code-section">
+      <p class="section-label">快速上手</p>
+      <h2>三步开始使用</h2>
+      <p class="section-sub">克隆仓库，安装依赖，运行代码或打包 EXE。</p>
+      <div class="code-wrap">
+        <div class="code-tabs">
+          <button class="tab-btn active">Python 使用</button>
+          <button class="tab-btn">本地打包</button>
+        </div>
+        <pre><code><span class="cm"># 克隆项目</span>
+git clone https://github.com/ggc4295/SimplePrj.git
+<span class="ck">cd</span> SimplePrj
+
+<span class="cm"># 安装开发依赖</span>
+pip install -e .[dev]
+
+<span class="cm"># 使用 Calculator</span>
+<span class="ck">from</span> src.calculator <span class="ck">import</span> Calculator
+calc = Calculator()
+<span class="ck">print</span>(calc.add(<span class="cs">3</span>, <span class="cs">5</span>))   <span class="cm"># → 8</span>
+<span class="ck">print</span>(calc.power(<span class="cs">2</span>, <span class="cs">10</span>)) <span class="cm"># → 1024</span>
+
+<span class="cm"># 运行测试</span>
+pytest --cov=src -v</code></pre>
+      </div>
+    </section>
+
+    <!-- CI Pipeline -->
+    <section>
+      <p class="section-label">CI/CD 流水线</p>
+      <h2>全自动化工作流</h2>
+      <p class="section-sub">从代码检查到 Release 发布，一切皆自动完成。</p>
+      <div class="pipeline">
+        <div class="pipe-step"><span class="dot"></span> push / PR</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><span class="dot"></span> Secret Scan</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><span class="dot"></span> Lint</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><span class="dot"></span> Test (4 版本)</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><span class="dot"></span> Build EXE</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step"><span class="dot"></span> Release</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2026 SimplePrj. Built for learning and demonstration.</p>
+      <div class="footer-links">
+        <a href="https://github.com/ggc4295/SimplePrj" target="_blank"
+          >GitHub</a
+        >
+        <a href="qa.html">常见问题</a>
+        <a href="https://github.com/ggc4295/SimplePrj/releases" target="_blank"
+          >Releases</a
+        >
+      </div>
+    </footer>
+  </body>
+</html>
