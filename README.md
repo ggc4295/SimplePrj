@@ -7,6 +7,7 @@ A simple Python project for testing GitHub CI/CD functionality.
 ## Features
 
 - Simple calculator module with basic math operations
+- **Interactive CLI calculator** — safe AST-based expression evaluator
 - Unit tests with pytest
 - GitHub Actions CI pipeline
 - Code linting with flake8
@@ -23,10 +24,12 @@ SimplePrj/
 ├── src/
 │   ├── __init__.py
 │   ├── calculator.py       # Calculator module
+│   ├── cli.py              # Interactive CLI calculator
 │   └── utils.py            # Utility functions
 ├── tests/
 │   ├── __init__.py
 │   ├── test_calculator.py  # Calculator tests
+│   ├── test_cli.py         # CLI tests
 │   └── test_utils.py       # Utility tests
 ├── .gitignore
 ├── pyproject.toml          # Project config & dependencies
@@ -74,6 +77,39 @@ uv run pytest --cov=src
 
 # Run with verbose output
 uv run pytest -v
+```
+
+## CLI Calculator
+
+Install the package and run the interactive calculator:
+
+```bash
+# Install in editable mode
+uv pip install -e .
+
+# Start the calculator
+calc
+```
+
+Example session:
+
+```
+SimplePrj Calculator — type an expression to evaluate
+Supports: + - * / ** % and parentheses
+Type 'help' for examples, 'quit' or 'exit' to quit.
+
+calc> 2 + 3
+  = 5
+calc> (3 + 4) * 2
+  = 14
+calc> 10 / 4
+  = 2.5
+calc> 2 ** 8
+  = 256
+calc> 17 % 5
+  = 2
+calc> quit
+Bye!
 ```
 
 ### Code Linting
