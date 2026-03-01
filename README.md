@@ -2,17 +2,18 @@
 
 ![CI](https://github.com/ggc4295/SimplePrj/actions/workflows/ci.yml/badge.svg)
 
-A simple Python project for testing GitHub CI/CD functionality.
+A simple Python project demonstrating GitHub CI/CD best practices, including an interactive CLI calculator, utility math functions, multi-version testing, and automated packaging.
 
 ## Features
 
-- Simple calculator module with basic math operations
-- **Interactive CLI calculator** — safe AST-based expression evaluator
-- Unit tests with pytest
-- GitHub Actions CI pipeline
-- Code linting with flake8
-- Code formatting check with black
-- Fast dependency management with [uv](https://docs.astral.sh/uv/)
+- **Interactive CLI calculator** — safe AST-based expression evaluator, no `eval`
+- **Calculator module** — add, subtract, multiply, divide, power, modulo
+- **Utility functions** — `is_even`, `is_positive`, `factorial`, `fibonacci`, `clamp`
+- **Unit tests** with pytest and coverage reporting
+- **GitHub Actions CI** — lint, test (Python 3.9–3.12), build, Windows EXE packaging
+- **Code quality** — flake8 linting + black formatting (line length 120)
+- **Fast dependency management** with [uv](https://docs.astral.sh/uv/)
+- **GitHub Pages** project website
 
 ## Project Structure
 
@@ -20,24 +21,24 @@ A simple Python project for testing GitHub CI/CD functionality.
 SimplePrj/
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml              # CI: lint / test / build / package
-│       ├── code-review.yml     # Automated code review
-│       ├── deploy-pages.yml    # Deploy web_site to GitHub Pages
+│       ├── ci.yml              # Lint / test / build / package (Windows EXE)
+│       ├── code-review.yml     # Automated code review on PRs
+│       ├── deploy-pages.yml    # Deploy web_site/ to GitHub Pages
 │       ├── release.yml         # Release workflow
-│       └── secret-scan.yml     # Secret scanning
+│       └── secret-scan.yml     # Secret scanning on push
 ├── src/
 │   ├── __init__.py
-│   ├── calculator.py           # Calculator module
+│   ├── calculator.py           # Calculator class (6 operations)
 │   ├── cli.py                  # Interactive CLI calculator
-│   ├── main.py                 # Main entry point
-│   └── utils.py                # Utility functions
+│   ├── main.py                 # Demo entry point (PyInstaller target)
+│   └── utils.py                # Math utility functions
 ├── tests/
 │   ├── __init__.py
 │   ├── test_calculator.py      # Calculator tests
-│   ├── test_cli.py             # CLI tests
-│   └── test_utils.py           # Utility tests
+│   ├── test_cli.py             # CLI / safe_eval tests
+│   └── test_utils.py           # Utility function tests
 ├── web_site/
-│   ├── index.html              # Project website
+│   ├── index.html              # Project website (GitHub Pages)
 │   └── qa.html                 # Q&A page
 ├── .gitattributes
 ├── .gitignore
@@ -55,8 +56,6 @@ SimplePrj/
 - Python 3.9+
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) — fast Python package manager
 
-### Install uv
-
 ```bash
 # macOS / Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -68,7 +67,6 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/ggc4295/SimplePrj.git
 cd SimplePrj
 
@@ -76,30 +74,15 @@ cd SimplePrj
 uv sync --extra dev
 ```
 
-> `uv sync` will automatically create a `.venv` and lock dependencies into `uv.lock`.
-
-### Running Tests
-
-```bash
-# Run all tests
-uv run pytest
-
-# Run with coverage
-uv run pytest --cov=src
-
-# Run with verbose output
-uv run pytest -v
-```
+> `uv sync` automatically creates `.venv` and locks dependencies into `uv.lock`.
 
 ## CLI Calculator
 
-Install the package and run the interactive calculator:
-
 ```bash
-# Install in editable mode
+# Install the package (registers the `calc` command)
 uv pip install -e .
 
-# Start the calculator
+# Launch
 calc
 ```
 
@@ -120,32 +103,67 @@ calc> 2 ** 8
   = 256
 calc> 17 % 5
   = 2
+calc> -3 + 10
+  = 7
+calc> help
+  Examples:
+    2 + 3           → 5
+    10 / 4          → 2.5
+    2 ** 8          → 256
+    (3 + 4) * 2     → 14
+    17 % 5          → 2
 calc> quit
 Bye!
 ```
 
-### Code Linting
+Expression parsing uses Python's `ast` module — no `eval`, no code injection risk.
+
+## Development
+
+### Running Tests
 
 ```bash
-# Run flake8
-uv run flake8 src/ tests/
+# Run all tests
+uv run pytest
 
-# Check formatting with black
-uv run black --check src/ tests/
+# Run with coverage
+uv run pytest --cov=src --cov-report=term-missing
 
-# Auto-format with black
-uv run black src/ tests/
+# Run a specific test file
+uv run pytest tests/test_cli.py -v
+```
+
+### Code Linting & Formatting
+
+```bash
+# Lint with flake8
+uv run flake8 src/ tests/ --max-line-length=120
+
+# Check formatting
+uv run black --check --line-length=120 src/ tests/
+
+# Auto-format
+uv run black --line-length=120 src/ tests/
 ```
 
 ## CI Pipeline
 
-The GitHub Actions CI pipeline runs on every push and pull request to `main` branch. It performs:
+Runs on every push and pull request to `main`.
 
-1. **Lint** - Code style checking with flake8 and black
-2. **Test** - Run unit tests on multiple Python versions (3.9, 3.10, 3.11, 3.12)
-3. **Build** - Verify package can be built successfully with `uv build`
+| Job | What it does |
+|-----|-------------|
+| **Lint** | flake8 + black check (Python 3.12) |
+| **Test** | pytest + coverage on Python 3.9, 3.10, 3.11, 3.12 |
+| **Build** | `uv build` — verify package builds cleanly |
+| **Package** | PyInstaller Windows EXE (`simpleprj.exe`) |
 
-All CI steps use the official [`astral-sh/setup-uv`](https://github.com/astral-sh/setup-uv) action with caching enabled for fast installs.
+Additional workflows:
+- **Secret Scan** — detects accidentally committed secrets
+- **Code Review** — automated review comments on PRs
+- **Deploy Pages** — publishes `web_site/` to GitHub Pages on push to `main`
+- **Release** — creates GitHub releases from tags
+
+All CI steps use [`astral-sh/setup-uv`](https://github.com/astral-sh/setup-uv) with caching for fast installs.
 
 ## License
 
