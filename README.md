@@ -20,20 +20,32 @@ A simple Python project for testing GitHub CI/CD functionality.
 SimplePrj/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml          # GitHub Actions CI workflow
+│       ├── ci.yml              # CI: lint / test / build / package
+│       ├── code-review.yml     # Automated code review
+│       ├── deploy-pages.yml    # Deploy web_site to GitHub Pages
+│       ├── release.yml         # Release workflow
+│       └── secret-scan.yml     # Secret scanning
 ├── src/
 │   ├── __init__.py
-│   ├── calculator.py       # Calculator module
-│   ├── cli.py              # Interactive CLI calculator
-│   └── utils.py            # Utility functions
+│   ├── calculator.py           # Calculator module
+│   ├── cli.py                  # Interactive CLI calculator
+│   ├── main.py                 # Main entry point
+│   └── utils.py                # Utility functions
 ├── tests/
 │   ├── __init__.py
-│   ├── test_calculator.py  # Calculator tests
-│   ├── test_cli.py         # CLI tests
-│   └── test_utils.py       # Utility tests
+│   ├── test_calculator.py      # Calculator tests
+│   ├── test_cli.py             # CLI tests
+│   └── test_utils.py           # Utility tests
+├── web_site/
+│   ├── index.html              # Project website
+│   └── qa.html                 # Q&A page
+├── .gitattributes
 ├── .gitignore
-├── pyproject.toml          # Project config & dependencies
-└── README.md
+├── build_exe.py                # PyInstaller build script
+├── CHANGELOG.md
+├── pyproject.toml              # Project config & dependencies
+├── README.md
+└── simpleprj.spec              # PyInstaller spec file
 ```
 
 ## Getting Started
