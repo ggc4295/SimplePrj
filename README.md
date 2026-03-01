@@ -155,13 +155,29 @@ Runs on every push and pull request to `main`.
 | **Lint** | flake8 + black check (Python 3.12) |
 | **Test** | pytest + coverage on Python 3.9, 3.10, 3.11, 3.12 |
 | **Build** | `uv build` — verify package builds cleanly |
-| **Package** | PyInstaller Windows EXE (`simpleprj.exe`) |
+| **Package** | PyInstaller Windows EXE (artifact only, not published) |
 
-Additional workflows:
-- **Secret Scan** — detects accidentally committed secrets
+All CI steps use [`astral-sh/setup-uv`](https://github.com/astral-sh/setup-uv) with caching for fast installs.
+
+## Release
+
+Triggered by pushing a version tag (`v*`) or manually via `workflow_dispatch`.
+
+1. Builds Windows EXE with PyInstaller
+2. Extracts release notes from `CHANGELOG.md`
+3. Publishes a GitHub Release with the EXE as a downloadable asset
+
+To create a new release, push a tag:
+
+```bash
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+```
+
+Additional automated workflows:
+- **Secret Scan** — detects accidentally committed secrets on every push
 - **Code Review** — automated review comments on PRs
 - **Deploy Pages** — publishes `web_site/` to GitHub Pages on push to `main`
-- **Release** — creates GitHub releases from tags
 
 All CI steps use [`astral-sh/setup-uv`](https://github.com/astral-sh/setup-uv) with caching for fast installs.
 
